@@ -92,7 +92,7 @@ Smearing length (&#197;) for the bound charge, used to reduce FFT truncation err
 Parameters available for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
 
 * <b>LAMBDA_D_K</b> = 0 (default) \
-Set the Debye screening length (&#197;) for <b>ISOL</b>=1. Setting <b>LAMBDA_D_K</b> <= 0 will turn off ionic screening. Can also be used with <b>ISOL</b>=2 as an alternative to <b>C_MOLAR</b>.
+Set the Debye screening length (&#197;) for <b>ISOL</b>=1. Setting <b>LAMBDA_D_K</b> $\le$ 0 will turn off ionic screening. Can also be used with <b>ISOL</b>=2 as an alternative to <b>C_MOLAR</b>.
 
 Parameters only available for <b>ISOL</b>=2:
 
@@ -112,10 +112,10 @@ Ionic radius (&#197;) for constructing the ionic cavity
 
 ### Constant potential calculations (<b>ISOL</b>=2 only)
 
-VASPsol++ can perform constant potential calculations where the number of electrons in varied. This is done by specifying the <b>EFERMI_ref</b> parameter in the <b>INCAR</b>. Note that this only works when ionic screening is present in the electrolyte (<b>C_MOLAR</b> > 0); otherwise, the Fermi energy is undefined with respect to the vacuum level.
+VASPsol++ can perform constant potential calculations where the number of electrons in varied. This is done by specifying the <b>EFERMI_ref</b> parameter in the <b>INCAR</b>. Note that this only works when ionic screening is present in the electrolyte (<b>C_MOLAR</b> $\gt$ 0); otherwise, the Fermi energy is undefined with respect to the vacuum level.
 
 * <b>EFERMI_ref</b> = 0 (default) \
-Electron chemical potential with respect to vacuum. Runs a constant potential calculation when <b>EFERMI_ref</b> < 0
+Electron chemical potential with respect to vacuum. Runs a constant potential calculation when <b>EFERMI_ref</b> $\lt$ 0
 * <b>capacitance_init</b> = 1.0 (default) \
 Initial guess for the capacitance of the unit cell (e/V), used for updating the number of electrons
 
@@ -136,11 +136,11 @@ EFERMI_ref = -4.47   # set to the electron chemical potential in eV
 
 The most important output quantities from VASPsol++ are the free energy and the Fermi level. The free energy printed by the main VASP program contains all necessary solvation corrections and can be used directly for computing free energy differences between states. Importantly, the free energy and Fermi level are properly referenced even for charged systems as long as ionic screening is present in the electrolyte. Unlike the original VASPsol implementation, there are no additional corrections that need to be applied these quantities.
 
-In the case of constant potential calculations (<b>EFERMI_ref</b> < 0), VASP prints the grand canonical potential $\Omega$ rather than the free energy $F$. This is defined as,
+In the case of constant potential calculations (<b>EFERMI_ref</b> $\lt$ 0), VASP prints the grand canonical potential $\Omega$ rather than the free energy $F$. This is defined as,
 
 $$ \Omega = F - q_\mathrm{sol} \mu_\mathrm{e} $$
 
-where $q_\mathrm{sol}$ is the solute charge using an <it> electron is positive </it> convention and $\mu_\mathrm{e}$ is the electron chemical potential with respect to vacuum (equal to the Fermi level printed in VASP).
+where $q_\mathrm{sol}$ is the solute charge using an <b><i> electron is positive </i></b> convention and $\mu_\mathrm{e}$ is the electron chemical potential with respect to vacuum (equal to the Fermi level printed in VASP).
 
 All solvation corrections, including the additional $q_\mathrm{sol} \mu_\mathrm{e}$ term subtracted in constant potential calculations, are also applied to the $E_0$ value printed by VASP. This is the electronic energy extrapolated to 0 K and is the suggested quantity to use when computing free energy differences between states, even with solvation. The entropic contribution removed from $F$ to obtain $E_0$ arises from electronic entropy in the solute at high temperatures assossiated with the smearing procedure; these have nothing to do with entropy in the electrolye or any other non-electronic entropy.
 
