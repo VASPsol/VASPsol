@@ -1,92 +1,171 @@
-# VASPsol++
+VASPsol++ is a framework for implementing complex continuum fluid models within density functional theory calculations performed using the Vienna Ab initio Simulation Package (VASP). It is being actively developed within the Plaisance group at Louisiana State University and has its origins in the VASPsol code developed in the Hennig group at the University of Florida.
+
+VASPsol++ adds a nonlocal and nonlinear implicit electrolyte model to the linear polarizable continuum model contained in the original VASPsol code. Additionally, it is written in a modular format that allows for easy addition of any new continuum solvation models that are developed in the future.
+
+# Key features of the nonlinear+nonlocal model
+
+* Nonlinear dielectric and ionic responses to model the high electric fields present at charged electrodes
+* Uses a nonlocal cavity definition to prevent unphysical electrolyte leakage into small regions and to allow for separate dielectric and ionic cavities
+* Efficient and robust solver for the nonlinear Poisson-Boltzmann equation based on Newton's method with a line search
+* Option to performing calculations at constant potential rather than constant number of electrons (grand canonical DFT)
+* Only slightly higher computational cost than the linear VASPsol model
 
 
+# Input
 
-## Getting started
+## General
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Parameters available for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+* <b>LSOL</b>
+    * <b>LSOL</b> = .TRUE. \
+    turn on solvation
+    * <b>LSOL</b> = .FALSE. (default) \
+    turn off solvation
+* <b>ISOL</b>
+    * <b>ISOL</b> = 1 (default) \
+    use the linear+local solvation model from the original VASPsol implementation
+    * <b>ISOL</b> = 2 \
+    use the nonlinear+nonlocal solvation model
+* <b>LSOL_SCF</b>
+    * <b>LSOL_SCF</b> = .TRUE. (default) \
+    include solvation in the SCF cycle
+    * <b>LSOL_SCF</b> = .FALSE. (not recommended) \
+    do not include solvation in the SCF cycle, only as a correction at the end
 
-## Add your files
+Parameters only available for <b>ISOL</b>=2:
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+* <b>SOLTEMP</b> = 298 (default) \
+Set the simulation temperature in K
+* <b>A_K</b> = 0.125 (default) \
+Set the smoothing length (&#197;) for eliminating FFT errors. The default value works well for the standard FFT grid used to represent the charge density in VASP.
+
+## Cavity definition
+
+Parameters available for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
+
+* <b>NC_K</b> = 0.0025 (default, <b>ISOL</b>=1) \
+<b>NC_K</b> = 0.015 (default, <b>ISOL</b>=2) \
+Cut-off charge density (e/&#197;<sup>3</sup>) for determining the vdW cavity
+* <b>SIGMA</b> = 0.6 (default) \
+Smoothness of the cavity transition. Increasing this value will make the cavity transition smoother, decreasing will make it sharper.
+* <b>TAU</b> = 5.25e-4 (default, <b>ISOL</b>=1) \
+<b>TAU</b> = 8.79e-4 (default, <b>ISOL</b>=2) \
+Effective surface tension (eV/&#197;<sup>2</sup>) for computing the cavity formation free energy
+
+Parameters only available for <b>ISOL</b>=2:
+
+* <b>R_CAV</b> = 0. (default) \
+Offset (&#197;) for determining the solute surface area used for calculating the cavity formation free energy
+
+## Solvent specification
+
+Parameters available for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
+
+* <b>EB_K</b> = 78.4 (default) \
+Bulk dielectric constant of the solvent
+
+Parameters only available for <b>ISOL</b>=2:
+
+* <b>LNLDIEL</b>
+    * <b>LNLDIEL</b> = .TRUE. (default)\
+    use a nonlinear dielectric screening model
+    * <b>LNLDIEL</b> = .FALSE. \
+    use a linear dielectric screening model
+* <b>EPSILON_INF</b> = 1.78 (default) \
+Bulk optical dielectric constant of the solvent
+* <b>N_MOL</b> = 0.0335 (default) \
+Density of solvent molecules in the bulk (&#197;<sup>-3</sup>)
+* <b>P_MOL</b> = 0.50 (default) \
+Dipole moment of a solvent molecule (e-&#197;)
+* <b>R_SOLV</b> = 1.40 (default) \
+Solvent radius (&#197;) for constructing the solvent cavity
+* <b>R_DIEL</b> = 1.00 (default) \
+Dielectric radius (&#197;) for constructing the dielectric cavity
+* <b>R_B</b> = A_K (default) \
+Smearing length (&#197;) for the bound charge, used to reduce FFT truncation error
+
+## Electrolyte specification
+
+Parameters available for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
+
+* <b>LAMBDA_D_K</b> = 0 (default) \
+Set the Debye screening length (&#197;) for <b>ISOL</b>=1. Setting <b>LAMBDA_D_K</b> <= 0 will turn off ionic screening. Can also be used with <b>ISOL</b>=2 as an alternative to <b>C_MOLAR</b>.
+
+Parameters only available for <b>ISOL</b>=2:
+
+* <b>LNLION</b>
+    * <b>LNLION</b> = .TRUE. (default)\
+    use a nonlinear ionic screening model
+    * <b>LNLION</b> = .FALSE. \
+    use a linear ionic screening model
+* <b>C_MOLAR</b> = 0.0 (default) \
+Concentration of the electrolyte (mol/L)
+* <b>ZION</b> = 1.0 (default) \
+Electrolyte valency
+* <b>D_ION</b> = 2<sup>5/6</sup>R_ION (default) \
+Packing diameter of the ions (&#197;), defaults to the close-packed diameter corresponding to <b>R_ION</b>
+* <b>R_ION</b> = R_SOLV (default) \
+Ionic radius (&#197;) for constructing the ionic cavity
+
+## Constant potential calculations (<b>ISOL</b>=2 only)
+
+VASPsol++ can perform constant potential calculations where the number of electrons in varied. This is done by specifying the <b>EFERMI_ref</b> parameter in the <b>INCAR</b>. Note that this only works when ionic screening is present in the electrolyte (<b>C_MOLAR</b> > 0); otherwise, the Fermi energy is undefined with respect to the vacuum level.
+
+* <b>EFERMI_ref</b> = 0 (default) \
+Electron chemical potential with respect to vacuum. Runs a constant potential calculation when <b>EFERMI_ref</b> < 0
+* <b>capacitance_init</b> = 1.0 (default) \
+Initial guess for the capacitance of the unit cell (e/V), used for updating the number of electrons
+
+## Recommended <b>INCAR</b> for an aqueous electrolyte
+
+The default parameters correspond to pure water at 298 K. To model an electrolyte, it is necessary to specify the concentration (<b>C_MOLAR</b>) and the ionic radius (<b>R_ION</b>). If the latter is not specified, it defaults to the solvent radius which is likely too small. <b>EFERMI_ref</b> should be specified to run constant potential calculations. When using the default values for an aqueous electrolyte, we recommend setting <b>EFERMI_ref</b> $= -4.47 - U$, where $U$ is the electrode potential with respect to the standard hydrogen electrode.
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/cplaisance/vaspsol_pp.git
-git branch -M main
-git push -uf origin main
+LSOL = .TRUE.
+ISOL = 2
+C_MOLAR = 1.0        # set to the electrolyte concentration in mol/L
+R_ION = 4.0          # set to the ionic radius in Angstrom
+EFERMI_ref = -4.47   # set to the electron chemical potential in eV
 ```
 
-## Integrate with your tools
 
-- [ ] [Set up project integrations](https://gitlab.com/cplaisance/vaspsol_pp/-/settings/integrations)
+# Output
 
-## Collaborate with your team
+Specifying <b>LVHAR = .TRUE.</b> or <b>LVTOT = .TRUE.</b> in the <b>INCAR</b> will cause the following files to be written at the end of the calculation. These files have the same format as <b>LOCPOT</b>.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+Files written for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
 
-## Test and Deploy
+* <b>PHI</b> \
+electrostatic potential, should be same as <b>LOCPOT</b>
+* <b>PHI_SOLV</b> \
+electrostatic potential from the solvent
+* <b>VSOLV</b> \
+cavity correction to the KS potential
+* <b>RHOB</b> \
+bound charge density
+* <b>RHOION</b> \
+electrolyte ionic charge density
 
-Use the built-in continuous integration in GitLab.
+Files written only for <b>ISOL</b>=1:
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+* <b>S</b> \
+solvent cavity
 
-***
+Files written only for <b>ISOL</b>=2:
 
-# Editing this README
+* <b>ELOC</b> \
+electrostatic field in the z direction
+* <b>P</b> \
+solvent polarization density in the z direction
+* <b>SVDW</b> \
+vdW cavity
+* <b>SSOLV</b> \
+solvent cavity
+* <b>SION</b> \
+ionic cavity
+* <b>SDIEL</b> \
+dielectric cavity
+* <b>SCAV</b> \
+cavity used for calculating the cavity formation free energy, equal to <b>SSOLV</b> by default unless <b>R_CAV</b> is specified
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
