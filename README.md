@@ -1,8 +1,10 @@
+# VASPsol++: A framework for implementing complex continuum fluid models in VASP density functional theory calculations
+
 VASPsol++ is a framework for implementing complex continuum fluid models within density functional theory calculations performed using the Vienna Ab initio Simulation Package (VASP). It is being actively developed within the Plaisance group at Louisiana State University and has its origins in the VASPsol code developed in the Hennig group at the University of Florida.
 
 VASPsol++ adds a nonlocal and nonlinear implicit electrolyte model to the linear polarizable continuum model contained in the original VASPsol code. Additionally, it is written in a modular format that allows for easy addition of any new continuum solvation models that are developed in the future.
 
-# Key features of the nonlinear+nonlocal model
+## Key features of the nonlinear+nonlocal model
 
 * Nonlinear dielectric and ionic responses to model the high electric fields present at charged electrodes
 * Uses a nonlocal cavity definition to prevent unphysical electrolyte leakage into small regions and to allow for separate dielectric and ionic cavities
@@ -11,9 +13,9 @@ VASPsol++ adds a nonlocal and nonlinear implicit electrolyte model to the linear
 * Only slightly higher computational cost than the linear VASPsol model
 
 
-# Input
+## Input
 
-## General
+### General
 
 Parameters available for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
 
@@ -40,7 +42,7 @@ Set the simulation temperature in K
 * <b>A_K</b> = 0.125 (default) \
 Set the smoothing length (&#197;) for eliminating FFT errors. The default value works well for the standard FFT grid used to represent the charge density in VASP.
 
-## Cavity definition
+### Cavity definition
 
 Parameters available for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
 
@@ -58,7 +60,7 @@ Parameters only available for <b>ISOL</b>=2:
 * <b>R_CAV</b> = 0. (default) \
 Offset (&#197;) for determining the solute surface area used for calculating the cavity formation free energy
 
-## Solvent specification
+### Solvent specification
 
 Parameters available for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
 
@@ -85,7 +87,7 @@ Dielectric radius (&#197;) for constructing the dielectric cavity
 * <b>R_B</b> = A_K (default) \
 Smearing length (&#197;) for the bound charge, used to reduce FFT truncation error
 
-## Electrolyte specification
+### Electrolyte specification
 
 Parameters available for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
 
@@ -108,7 +110,7 @@ Packing diameter of the ions (&#197;), defaults to the close-packed diameter cor
 * <b>R_ION</b> = R_SOLV (default) \
 Ionic radius (&#197;) for constructing the ionic cavity
 
-## Constant potential calculations (<b>ISOL</b>=2 only)
+### Constant potential calculations (<b>ISOL</b>=2 only)
 
 VASPsol++ can perform constant potential calculations where the number of electrons in varied. This is done by specifying the <b>EFERMI_ref</b> parameter in the <b>INCAR</b>. Note that this only works when ionic screening is present in the electrolyte (<b>C_MOLAR</b> > 0); otherwise, the Fermi energy is undefined with respect to the vacuum level.
 
@@ -117,7 +119,7 @@ Electron chemical potential with respect to vacuum. Runs a constant potential ca
 * <b>capacitance_init</b> = 1.0 (default) \
 Initial guess for the capacitance of the unit cell (e/V), used for updating the number of electrons
 
-## Recommended <b>INCAR</b> for an aqueous electrolyte
+### Recommended <b>INCAR</b> for an aqueous electrolyte
 
 The default parameters correspond to pure water at 298 K. To model an electrolyte, it is necessary to specify the concentration (<b>C_MOLAR</b>) and the ionic radius (<b>R_ION</b>). If the latter is not specified, it defaults to the solvent radius which is likely too small. <b>EFERMI_ref</b> should be specified to run constant potential calculations. When using the default values for an aqueous electrolyte, we recommend setting <b>EFERMI_ref</b> $= -4.47 - U$, where $U$ is the electrode potential with respect to the standard hydrogen electrode.
 
@@ -130,7 +132,7 @@ EFERMI_ref = -4.47   # set to the electron chemical potential in eV
 ```
 
 
-# Output
+## Output
 
 Specifying <b>LVHAR = .TRUE.</b> or <b>LVTOT = .TRUE.</b> in the <b>INCAR</b> will cause the following files to be written at the end of the calculation. These files have the same format as <b>LOCPOT</b>.
 
