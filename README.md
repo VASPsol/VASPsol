@@ -142,7 +142,9 @@ $$ \Omega = F - q_\mathrm{sol} \mu_\mathrm{e} $$
 
 where $q_\mathrm{sol}$ is the solute charge using an <it> electron is positive </it> convention and $\mu_\mathrm{e}$ is the electron chemical potential with respect to vacuum (equal to the Fermi level printed in VASP).
 
-Specifying <b>LVHAR = .TRUE.</b> or <b>LVTOT = .TRUE.</b> in the <b>INCAR</b> will cause the following files to be written at the end of the calculation. These files have the same format as <b>LOCPOT</b>.
+All solvation corrections, including the additional $q_\mathrm{sol} \mu_\mathrm{e}$ term subtracted in constant potential calculations, are also applied to the $E_0$ value printed by VASP. This is the electronic energy extrapolated to 0 K and is the suggested quantity to use when computing free energy differences between states, even with solvation. The entropic contribution removed from $F$ to obtain $E_0$ arises from electronic entropy in the solute at high temperatures assossiated with the smearing procedure; these have nothing to do with entropy in the electrolye or any other non-electronic entropy.
+
+Specifying <b>LVHAR = .TRUE.</b> or <b>LVTOT = .TRUE.</b> in the <b>INCAR</b> will cause the following additional files to be written at the end of the calculation. These files have the same format as <b>LOCPOT</b>.
 
 Files written for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
 
