@@ -134,6 +134,14 @@ EFERMI_ref = -4.47   # set to the electron chemical potential in eV
 
 ## Output
 
+The most important output quantities from VASPsol++ are the free energy and the Fermi level. The free energy printed by the main VASP program contains all necessary solvation corrections and can be used directly for computing free energy differences between states. Importantly, the free energy and Fermi level are properly referenced even for charged systems as long as ionic screening is present in the electrolyte. Unlike the original VASPsol implementation, there are no additional corrections that need to be applied these quantities.
+
+In the case of constant potential calculations (<b>EFERMI_ref</b> < 0), VASP prints the grand canonical potential rather than the free energy, defined as,
+
+```math
+\Omega = F - q_{sol} \mu_e
+```
+
 Specifying <b>LVHAR = .TRUE.</b> or <b>LVTOT = .TRUE.</b> in the <b>INCAR</b> will cause the following files to be written at the end of the calculation. These files have the same format as <b>LOCPOT</b>.
 
 Files written for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
