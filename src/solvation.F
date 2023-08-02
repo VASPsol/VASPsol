@@ -1166,6 +1166,8 @@ SUBROUTINE LPCM_solver(phi_sol, n_e, q_sol, tol, V_corr, n_solv, A_corr)
  CALL SOL_pot(V_corr, n_b, n_ion)
  CALL STOP_TIMING("SOL",IU6,"SOL_pot")
  
+ IF (LWRITE) CALL WRITE_TO_FILE_RC('VSOLV', V_corr)
+ 
  !add electrostatic potential correction (phi_solv) to V_corr
  V_corr = V_corr + phi_solv
  !compute solvation free energy (A_solv) and add A_cav
@@ -1179,6 +1181,7 @@ SUBROUTINE LPCM_solver(phi_sol, n_e, q_sol, tol, V_corr, n_solv, A_corr)
  IF (LWRITE) THEN
    CALL WRITE_TO_FILE_RC('RHOB', n_b)
    CALL WRITE_TO_FILE_RC('RHOION', n_ion)
+   CALL WRITE_TO_FILE_RC('PHI', phi_solv)
    CALL WRITE_TO_FILE_RC('PHISOLV', phi_solv)
    CALL WRITE_TO_FILE_RL('S', S)
    CALL STOP_TIMING("SOL",IU6,"WRITE")
@@ -1545,11 +1548,11 @@ MODULE solvation_nlpcm
  
  REAL(q) :: sigma_k = 0.6_q
  REAL(q) :: a_k = 0.125_q
- REAL(q) :: nc_k = 0.0025_q
- REAL(q) :: tau = 5.25E-4_q
- REAL(q) :: r_solv = 0._q
+ REAL(q) :: nc_k = 0.015_q
+ REAL(q) :: tau = 8.79E-4_q
+ REAL(q) :: r_solv = 1.4_q
  REAL(q) :: r_cav = 0._q
- REAL(q) :: r_diel = 0._q
+ REAL(q) :: r_diel = 1.0_q
  REAL(q) :: r_ion = 0._q
  REAL(q) :: r_b = 0._q
  REAL(q) :: eb_k = 78.4_q
