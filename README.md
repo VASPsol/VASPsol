@@ -13,6 +13,11 @@ VASPsol++ adds a nonlocal and nonlinear implicit electrolyte model to the linear
 * Only slightly higher computational cost than the linear VASPsol model
 
 
+## Installation
+
+VASPsol++ is mostly implemented in a single fortran file, solvation.F, that can be found in the src/ directory of the repository. Additionally, a patch file is required to make modifications to some of the original VASP source files. These patch files are version specific and are located in the src/patches director of the repository. 
+
+
 ## Input
 
 ### General
