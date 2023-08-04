@@ -31,7 +31,7 @@ The instructions below assume you have downloaded the VASP source files in a dir
 
 ### General
 
-Parameters available for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
+Parameters available for all solvation models:
 
 * <b>LSOL</b>
     * <b>LSOL</b> = .TRUE. \
