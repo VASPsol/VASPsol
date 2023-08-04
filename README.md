@@ -162,36 +162,23 @@ Specifying <b>LVHAR = .TRUE.</b> or <b>LVTOT = .TRUE.</b> in the <b>INCAR</b> wi
 
 Files written for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
 
-* <b>PHI</b> \
-electrostatic potential, should be same as <b>LOCPOT</b>
-* <b>PHI_SOLV</b> \
-electrostatic potential from the solvent
-* <b>VSOLV</b> \
-cavity correction to the KS potential
-* <b>RHOB</b> \
-bound charge density
-* <b>RHOION</b> \
-electrolyte ionic charge density
+* <b>PHI</b> : electrostatic potential, should be same as <b>LOCPOT</b>
+* <b>PHI_SOLV</b> : electrostatic potential from the solvent
+* <b>VSOLV</b> : cavity correction to the KS potential
+* <b>RHOB</b> : bound charge density
+* <b>RHOION</b> : electrolyte ionic charge density
 
 Files written only for <b>ISOL</b>=1:
 
-* <b>S</b> \
-solvent cavity
+* <b>S</b> : solvent cavity
 
 Files written only for <b>ISOL</b>=2:
 
-* <b>ELOC</b> \
-electrostatic field in the z direction
-* <b>P</b> \
-solvent polarization density in the z direction
-* <b>SVDW</b> \
-vdW cavity
-* <b>SSOLV</b> \
-solvent cavity
-* <b>SION</b> \
-ionic cavity
-* <b>SDIEL</b> \
-dielectric cavity
-* <b>SCAV</b> \
-cavity used for calculating the cavity formation free energy, equal to <b>SSOLV</b> by default unless <b>R_CAV</b> is specified
+* <b>ELOC</b> : electrostatic field in the z direction
+* <b>P</b> : solvent polarization density in the z direction
+* <b>SVDW</b> : vdW cavity
+* <b>SSOLV</b> : solvent cavity
+* <b>SION</b> : ionic cavity
+* <b>SDIEL</b> : dielectric cavity
+* <b>SCAV</b> : cavity used for calculating the cavity formation free energy, equal to <b>SSOLV</b> by default unless <b>R_CAV</b> is specified
 
