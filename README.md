@@ -1,6 +1,6 @@
 # VASPsol++: A framework for implementing complex continuum fluid models in VASP density functional theory calculations
 
-VASPsol++ is a framework for implementing complex continuum fluid models within density functional theory calculations performed using the Vienna Ab initio Simulation Package (VASP) ([https://www.vasp.at/](url)). It is being actively developed within the Plaisance group ([https://www.lsu.edu/eng/che/people/faculty/plaisance.php](url)) at Louisiana State University and has its origins in the VASPsol code ([https://github.com/henniggroup/VASPsol](url)) developed in the Hennig group ([https://hennig.mse.ufl.edu/](url)) at the University of Florida.
+VASPsol++ is a framework for implementing complex continuum fluid models within density functional theory calculations performed using the [Vienna Ab initio Simulation Package](https://www.vasp.at/) (VASP). It is being actively developed within the [Plaisance group](https://www.lsu.edu/eng/che/people/faculty/plaisance.php) at Louisiana State University and has its origins in the [VASPsol](https://github.com/henniggroup/VASPsol) code developed in the [Hennig group](https://hennig.mse.ufl.edu/) at the University of Florida.
 
 VASPsol++ adds a nonlocal and nonlinear implicit electrolyte model to the linear polarizable continuum model contained in the original VASPsol code. Additionally, it is written in a modular format that allows for easy addition of any new continuum solvation models that are developed in the future.
 
@@ -21,7 +21,7 @@ The instructions below assume you have downloaded the VASP source files in a dir
 
 1. Download the `src/solvation.F` file from the repository and copy it to `<VASP_SRC>/src/`, replacing the skeleton `solvation.F file` already there.
 
-2. Download the appropriate patch file from src/patches and copy to `<VASP_SRC>/`. There are actually two patch files for each version of VASP. The first, named `vaspsol++-vtst-vasp_<version>.patch`, should be used if you are using the VTST add-on developed by the Henkelman group ([https://theory.cm.utexas.edu/vtsttools/](url)). Otherwise, use the patch file named `vaspsol++-vasp_<version>.patch`.
+2. Download the appropriate patch file from src/patches and copy to `<VASP_SRC>/`. There are actually two patch files for each version of VASP. The first, named `vaspsol++-vtst-vasp_<version>.patch`, should be used if you are using the [VASP Transition State Tools](https://theory.cm.utexas.edu/vtsttools/) add-on developed by the [Henkelman group](http://henkelmanlab.org/) at UT Austin. Otherwise, use the patch file named `vaspsol++-vasp_<version>.patch`.
 
 3. Apply the patch by running (where `<patch_file>` is the name of the patch file): `patch -p1 < <patch_file>`
 
