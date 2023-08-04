@@ -2,7 +2,7 @@
 
 VASPsol++ is a framework for implementing complex continuum fluid models within density functional theory calculations performed using the [Vienna Ab initio Simulation Package](https://www.vasp.at/) (VASP). It is being actively developed within the [Plaisance group](https://www.lsu.edu/eng/che/people/faculty/plaisance.php) at Louisiana State University and has its origins in the [VASPsol](https://github.com/henniggroup/VASPsol) code developed in the [Hennig group](https://hennig.mse.ufl.edu/) at the University of Florida.
 
-VASPsol++ adds a nonlocal and nonlinear implicit electrolyte model to the linear polarizable continuum model contained in the original VASPsol code. Additionally, it is written in a modular format that allows for easy addition of any new continuum solvation models that are developed in the future.
+VASPsol++ adds a [nonlocal and nonlinear implicit electrolyte model](#references) to the [linear polarizable continuum model](#references) contained in the original VASPsol code. Additionally, it is written in a modular format that allows for easy addition of any new continuum solvation models that are developed in the future.
 
 ## Key features of the nonlinear+nonlocal model
 
@@ -181,4 +181,15 @@ Files written only for <b>ISOL</b>=2:
 * <b>SION</b> : ionic cavity
 * <b>SDIEL</b> : dielectric cavity
 * <b>SCAV</b> : cavity used for calculating the cavity formation free energy, equal to <b>SSOLV</b> by default unless <b>R_CAV</b> is specified
+
+
+## References
+
+<b>Original linear+local VASPsol method</b>
+* Implicit solvation model for density-functional study of nanocrystal surfaces and reaction pathways. K. Mathew, R. Sundararaman, K. Letchworth-Weaver, T.A. Arias, and R.G. Hennig, J. Chem. Phys. 140, 084106 (2014), (https://doi.org/10.1063/1.4865107).
+* Implicit self-consistent electrolyte model in plane-wave density-functional theory. K. Mathew, V.S. C. Kolluru, S. Mula, S.N. Steinmann, and R.G. Hennig, J. Chem. Phys. 151, 234101 (2019), (https://doi.org/10.1063/1.5132354).
+
+<b>Nonlinear+nonlocal model</b>
+* Development and implementation of a nonlocal and nonlinear implicit electrolyte model. S.M.R. Islam, F. Khezeli, S. Ringe, and C. Plaisance, doi: 
+10.48550/arXiv.2307.04551 (2023), (https://doi.org/10.48550/arXiv.2307.04551).
 
