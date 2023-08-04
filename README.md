@@ -15,19 +15,17 @@ VASPsol++ adds a nonlocal and nonlinear implicit electrolyte model to the linear
 
 ## Installation
 
-VASPsol++ is mostly implemented in a single fortran file, solvation.F, that can be found in the src/ directory of the repository. Additionally, a patch file is required to make modifications to some of the original VASP source files. These patch files are version specific and are located in the src/patches director of the repository. Currently, a patch is available only for VASP 5.4.4 although the patch could possibly work with other versions.
+VASPsol++ is mostly implemented in a single fortran file, solvation.F, that can be found in the src/ directory of the repository. Additionally, a patch file is required to make modifications to some of the original VASP source files. These patch files are version specific and are located in the src/patches director of the repository. Currently, patch files are available only for VASP 5.4.4 although these could possibly work with other versions (no guarantees).
 
 The instructions below assume you have downloaded the VASP source files in a directory <VASP_SRC> and configured the necessary makefiles specified in the VASP installation instructions.
 
-1. Download the src/solvation.F file from the repository and copy it to <VASP_SRC>/src/, replacing the solvation.F file already there.
+1. Download the src/solvation.F file from the repository and copy it to <VASP_SRC>/src/, replacing the skeleton solvation.F file already there.
 
-2. Download the appropriate patch file from src/patches and copy to <VASP_SRC>/
+2. Download the appropriate patch file from src/patches and copy to <VASP_SRC>/. There are actually two patch files for each version of VASP. The first, named `vaspsol++-vtst-vasp_<version>.patch`, should be used if you are using the VTST add-on developed by the Henkelman group ([https://theory.cm.utexas.edu/vtsttools/](url)). Otherwise, use the patch file named `vaspsol++-vasp_<version>.patch`.
 
-3. Apply the patch by running \
-```
-patch -p0 <patch_file> 
-```
+3. Apply the patch by running (where <patch_file> is the name of the patch file): `patch -p1 < <patch_file>`
 
+4. Compile VASP as you normally would
 
 ## Input
 
