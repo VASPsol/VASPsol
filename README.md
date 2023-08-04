@@ -23,9 +23,9 @@ The instructions below assume you have downloaded the VASP source files in a dir
 
 2. Download the appropriate patch file from src/patches and copy to `<VASP_SRC>/`. There are actually two patch files for each version of VASP. The first, named `vaspsol++-vtst-vasp_<version>.patch`, should be used if you are using the [VASP Transition State Tools](https://theory.cm.utexas.edu/vtsttools/) add-on developed by the [Henkelman group](http://henkelmanlab.org/) at UT Austin. Otherwise, use the patch file named `vaspsol++-vasp_<version>.patch`.
 
-3. Apply the patch by running (where `<patch_file>` is the name of the patch file): `patch -p1 < <patch_file>`
+3. Apply the patch by running `patch -p1 < <patch_file>`.
 
-4. Compile VASP as you normally would
+4. Compile VASP as you normally would.
 
 ## Input
 
