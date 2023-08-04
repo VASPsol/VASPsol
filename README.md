@@ -1,6 +1,6 @@
 # VASPsol++: A framework for implementing complex continuum fluid models in VASP density functional theory calculations
 
-VASPsol++ is a framework for implementing complex continuum fluid models within density functional theory calculations performed using the Vienna Ab initio Simulation Package (VASP). It is being actively developed within the Plaisance group at Louisiana State University and has its origins in the VASPsol code developed in the Hennig group at the University of Florida ([https://github.com/henniggroup/VASPsol](url)).
+VASPsol++ is a framework for implementing complex continuum fluid models within density functional theory calculations performed using the Vienna Ab initio Simulation Package (VASP) ([https://www.vasp.at/](url)). It is being actively developed within the Plaisance group ([https://www.lsu.edu/eng/che/people/faculty/plaisance.php](url)) at Louisiana State University and has its origins in the VASPsol code ([https://github.com/henniggroup/VASPsol](url)) developed in the Hennig group ([https://hennig.mse.ufl.edu/](url)) at the University of Florida.
 
 VASPsol++ adds a nonlocal and nonlinear implicit electrolyte model to the linear polarizable continuum model contained in the original VASPsol code. Additionally, it is written in a modular format that allows for easy addition of any new continuum solvation models that are developed in the future.
 
