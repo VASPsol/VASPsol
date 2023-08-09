@@ -21,7 +21,7 @@ The instructions below assume you have downloaded the VASP source files in a dir
 
 1. Download (using `wget`) one of the source file bundles from underneath 'Assets' on the page for the most recent release. Then extract it. For the `tar.gz` file, this is done with the command `tar -xzf vaspsol-pp-<version>.tar.gz`.
 
-2. Copy the `src/solvation.F` file from the extract source directory and copy it to `<VASP_SRC>/src/`, replacing the skeleton `solvation.F file` already there.
+2. Copy the `src/solvation.F` file from the VASPsol++ source directory and copy it to `<VASP_SRC>/src/`, replacing the skeleton `solvation.F file` already there.
 
 2. Copy the appropriate patch file from `src/patches` and to `<VASP_SRC>/`. There are actually two patch files for each version of VASP. The first, named `vaspsol++-vtst-vasp_<version>.patch`, should be used if you are using the [VASP Transition State Tools](https://theory.cm.utexas.edu/vtsttools/) add-on developed by the [Henkelman group](http://henkelmanlab.org/) at UT Austin. Otherwise, use the patch file named `vaspsol++-vasp_<version>.patch`.
 
