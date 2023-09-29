@@ -1,8 +1,8 @@
 # VASPsol++: A framework for implementing complex continuum fluid models in VASP density functional theory calculations
 
-VASPsol++ is a framework for implementing complex continuum fluid models within density functional theory calculations performed using the Vienna Ab initio Simulation Package (VASP). It is being actively developed within the Plaisance group at Louisiana State University and has its origins in the VASPsol code developed in the Hennig group at the University of Florida.
+VASPsol++ is a framework for implementing complex continuum fluid models within density functional theory calculations performed using the [Vienna Ab initio Simulation Package](https://www.vasp.at/) (VASP). It is being actively developed within the [Plaisance group](https://www.lsu.edu/eng/che/people/faculty/plaisance.php) at Louisiana State University and has its origins in the [VASPsol](https://github.com/henniggroup/VASPsol) code developed in the [Hennig group](https://hennig.mse.ufl.edu/) at the University of Florida.
 
-VASPsol++ adds a nonlocal and nonlinear implicit electrolyte model to the linear polarizable continuum model contained in the original VASPsol code. Additionally, it is written in a modular format that allows for easy addition of any new continuum solvation models that are developed in the future.
+VASPsol++ adds a [nonlocal and nonlinear implicit electrolyte model](#references) to the [linear polarizable continuum model](#references) contained in the original VASPsol code. Additionally, it is written in a modular format that allows for easy addition of any new continuum solvation models that are developed in the future.
 
 ## Key features of the nonlinear+nonlocal model
 
@@ -15,25 +15,25 @@ VASPsol++ adds a nonlocal and nonlinear implicit electrolyte model to the linear
 
 ## Installation
 
-VASPsol++ is mostly implemented in a single fortran file, solvation.F, that can be found in the src/ directory of the repository. Additionally, a patch file is required to make modifications to some of the original VASP source files. These patch files are version specific and are located in the src/patches director of the repository. Currently, a patch is available only for VASP 5.4.4 although the patch could possibly work with other versions.
+VASPsol++ is mostly implemented in a single fortran file, solvation.F, that can be found in the src/ directory of the repository. Additionally, a patch file is required to make modifications to some of the original VASP source files. These patch files are version specific and are located in the src/patches director of the repository. Currently, patch files are available only for VASP 5.4.4 although these could possibly work with other versions (no guarantees).
 
-The instructions below assume you have downloaded the VASP source files in a directory <VASP_SRC> and configured the necessary makefiles specified in the VASP installation instructions.
+The instructions below assume you have downloaded the VASP source files in a directory `<VASP_SRC>` and configured the necessary makefiles specified in the VASP installation instructions.
 
-1. Download the src/solvation.F file from the repository and copy it to <VASP_SRC>/src/, replacing the solvation.F file already there.
+1. Download (using `wget`) one of the source file bundles from underneath 'Assets' on the page for the most recent release. Then extract it. For the `tar.gz` file, this is done with the command `tar -xzf vaspsol-pp-<version>.tar.gz`. We refer to the resulting source file directory as `<VASPSOL_SRC>`.
 
-2. Download the appropriate patch file from src/patches and copy to <VASP_SRC>/
+2. Copy `<VASPSOL_SRC>/src/solvation.F` to `<VASP_SRC>/src/`, replacing the skeleton `solvation.F` file already there.
 
-3. Apply the patch by running \
-```
-patch -p0 <patch_file> 
-```
+2. Copy the appropriate patch file from `<VASPSOL_SRC>/src/patches` to `<VASP_SRC>/`. There are actually two patch files for each version of VASP. The first, named `vaspsol++-vtst-vasp_<version>.patch`, should be used if you are using the [VASP Transition State Tools](https://theory.cm.utexas.edu/vtsttools/) add-on developed by the [Henkelman group](http://henkelmanlab.org/) at UT Austin. Otherwise, use the patch file named `vaspsol++-vasp_<version>.patch`. <b>Note: We are not allowed to publicly post patches for the VASP source code. Please email [Craig Plaisance](mailto:plaisance@lsu.edu) to obtain the necessary patch.
 
+3. Apply the patch by running `patch -p1 < <patch_file>` in `<VASP_SRC>`.
+
+4. Compile VASP as you normally would.
 
 ## Input
 
 ### General
 
-Parameters available for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
+Parameters available for all solvation models:
 
 * <b>LSOL</b>
     * <b>LSOL</b> = .TRUE. \
@@ -164,36 +164,34 @@ Specifying <b>LVHAR = .TRUE.</b> or <b>LVTOT = .TRUE.</b> in the <b>INCAR</b> wi
 
 Files written for both <b>ISOL</b>=1 and <b>ISOL</b>=2:
 
-* <b>PHI</b> \
-electrostatic potential, should be same as <b>LOCPOT</b>
-* <b>PHI_SOLV</b> \
-electrostatic potential from the solvent
-* <b>VSOLV</b> \
-cavity correction to the KS potential
-* <b>RHOB</b> \
-bound charge density
-* <b>RHOION</b> \
-electrolyte ionic charge density
+* <b>PHI</b> : electrostatic potential, should be same as <b>LOCPOT</b>
+* <b>PHI_SOLV</b> : electrostatic potential from the solvent
+* <b>VSOLV</b> : cavity correction to the KS potential
+* <b>RHOB</b> : bound charge density
+* <b>RHOION</b> : electrolyte ionic charge density
 
 Files written only for <b>ISOL</b>=1:
 
-* <b>S</b> \
-solvent cavity
+* <b>S</b> : solvent cavity
 
 Files written only for <b>ISOL</b>=2:
 
-* <b>ELOC</b> \
-electrostatic field in the z direction
-* <b>P</b> \
-solvent polarization density in the z direction
-* <b>SVDW</b> \
-vdW cavity
-* <b>SSOLV</b> \
-solvent cavity
-* <b>SION</b> \
-ionic cavity
-* <b>SDIEL</b> \
-dielectric cavity
-* <b>SCAV</b> \
-cavity used for calculating the cavity formation free energy, equal to <b>SSOLV</b> by default unless <b>R_CAV</b> is specified
+* <b>ELOC</b> : electrostatic field in the z direction
+* <b>P</b> : solvent polarization density in the z direction
+* <b>SVDW</b> : vdW cavity
+* <b>SSOLV</b> : solvent cavity
+* <b>SION</b> : ionic cavity
+* <b>SDIEL</b> : dielectric cavity
+* <b>SCAV</b> : cavity used for calculating the cavity formation free energy, equal to <b>SSOLV</b> by default unless <b>R_CAV</b> is specified
+
+
+## References
+
+<b>Original linear+local VASPsol method</b>
+* Implicit solvation model for density-functional study of nanocrystal surfaces and reaction pathways. K. Mathew, R. Sundararaman, K. Letchworth-Weaver, T.A. Arias, and R.G. Hennig, J. Chem. Phys. 140, 084106 (2014), (https://doi.org/10.1063/1.4865107).
+* Implicit self-consistent electrolyte model in plane-wave density-functional theory. K. Mathew, V.S. C. Kolluru, S. Mula, S.N. Steinmann, and R.G. Hennig, J. Chem. Phys. 151, 234101 (2019), (https://doi.org/10.1063/1.5132354).
+
+<b>Nonlinear+nonlocal model</b>
+* Development and implementation of a nonlocal and nonlinear implicit electrolyte model. S.M.R. Islam, F. Khezeli, S. Ringe, and C. Plaisance, doi: 
+10.48550/arXiv.2307.04551 (2023), (https://doi.org/10.48550/arXiv.2307.04551).
 
