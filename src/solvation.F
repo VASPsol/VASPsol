@@ -300,7 +300,8 @@ SUBROUTINE MINIMIZE_L(resid, chi, ekappa2, w, dphi, tol, A_LPB, NCGSOL)
    
    iter = iter + 1
    IF (iter > 200) THEN
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: MINIMIZE_L: failed to converge in 200 iterations'
+      STOP
    ENDIF
    
    rMr_old = rMr
@@ -841,7 +842,8 @@ SUBROUTINE AVG_GRID_RC(ARRAY, ARRAY_AVG, IDIR)
          I = I + GRIDC%RC%NROW
       ENDDO
    CASE DEFAULT
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: AVG_GRID_RC: invalid direction'
+      STOP
    END SELECT
    
 END SUBROUTINE AVG_GRID_RC
@@ -1620,7 +1622,12 @@ SUBROUTINE NLPCM_solver(phi_sol, n_e, q_sol, tol, V_corr, n_solv, A_corr)
  qion_lim = f_ion * n_max*LATT_CUR%OMEGA * 0.99_q
  dsol_io ' qion_lim:  ', qion_lim
  IF (abs(q_sol) > qion_lim .AND. LNLION) THEN
-   ABORT
+   IF (IU0>=0) THEN
+      WRITE(IU0,*) 'ERROR: NLPCM_solver: your ''vacuum'' region is not large enough to accommodate the necessary counter charge'
+      WRITE(IU0,*) 'Maximum charge: ', qion_lim
+      WRITE(IU0,*) 'Surface/solute charge: ', q_sol
+   ENDIF
+   STOP
  ENDIF
  
  !phi = phi_sol + phi_solv
@@ -1643,7 +1650,8 @@ SUBROUTINE NLPCM_solver(phi_sol, n_e, q_sol, tol, V_corr, n_solv, A_corr)
    IF (rms < tol .AND. iter>=1) EXIT
    iter = iter + 1
    IF (iter > 100) THEN
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: NLPCM_solver: outer loop failed to converge in 100 iterations'
+      STOP
    ENDIF
    ! compute linearized response functions chi and ekappa2
    CALL SET_LPB(chi, ekappa2)
@@ -2278,10 +2286,12 @@ SUBROUTINE SET_LPB(chi, ekappa2)
    chi_perp = n_mol*S_diel/(1._q/chi_perp - invalpha_sic)
    
    IF (ANY(chi_par < 0._q)) THEN
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'Internal ERROR: SET_LPB: chi_par < 0'
+      STOP
    ENDIF
    IF (ANY(chi_perp < 0._q)) THEN
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'Internal ERROR: SET_LPB: chi_perp < 0'
+      STOP
    ENDIF
    
    ! store 1/|E_loc|^2 in RWORK
@@ -2450,7 +2460,8 @@ SUBROUTINE fzero_vec(f, a0, b0, tol, x, x0)
    
    ITER = ITER + 1
    IF (ITER > 100) THEN
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: fzero_vec: failed to converge in 100 iterations'
+      STOP
    ENDIF
    
    ! Choose bisection or interpolation
@@ -3285,12 +3296,15 @@ SUBROUTINE SOL_VCORRECTION(CHTOT, DENCOR, CVHAR, P)
       CALL NLPCM_solver(phi_sol, n_e, q_sol, tol, V_corr, n_solv, A_corr)
    CASE (3)
       ! run JDFT based polarizable continuum model
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: SOL_VCORRECTION: invalid value for ISOL'
+      STOP
    CASE (4)
       ! run externally using JDFTx
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: SOL_VCORRECTION: invalid value for ISOL'
+      STOP
    CASE DEFAULT
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: SOL_VCORRECTION: invalid value for ISOL'
+      STOP
  END SELECT
  dsol_io 'End minimization'
  !-------------------------------------------------------------
@@ -3382,14 +3396,16 @@ SUBROUTINE update_NELECT(NELECT,EFERMI)
  NELECT_LAST = NELECT
  NELECT = NELECT - capacitance*(EFERMI - EFERMI_ref)
  
- WRITE(IU6,*)
- WRITE(IU6,*) 'Adjusting number of electrons for constant potential calculation'
- WRITE(IU6,*)
- WRITE(IU6,'(3X,A,F18.8,6X,A,F18.8)') 'EFERMI = ', EFERMI,      'EFERMI_ref  = ', EFERMI_ref
- WRITE(IU6,'(3X,A,F18.8,6X,A,F18.8)') 'q_sol  = ', q_sol,       '-q*mu      =  ', -q_sol*EFERMI_ref
- WRITE(IU6,'(3X,A,F18.8,6X,A,F18.8)') 'NELECT = ', NELECT_LAST, 'new NELECT =  ', NELECT
- WRITE(IU6,'(36X,A,F18.8)')                                     'capacitance = ', capacitance
- WRITE(IU6,*)
+ IF (IU6>=0) THEN
+   WRITE(IU6,*)
+   WRITE(IU6,*) 'Adjusting number of electrons for constant potential calculation'
+   WRITE(IU6,*)
+   WRITE(IU6,'(3X,A,F18.8,6X,A,F18.8)') 'EFERMI = ', EFERMI,      'EFERMI_ref  = ', EFERMI_ref
+   WRITE(IU6,'(3X,A,F18.8,6X,A,F18.8)') 'q_sol  = ', q_sol,       '-q*mu      =  ', -q_sol*EFERMI_ref
+   WRITE(IU6,'(3X,A,F18.8,6X,A,F18.8)') 'NELECT = ', NELECT_LAST, 'new NELECT =  ', NELECT
+   WRITE(IU6,'(36X,A,F18.8)')                                     'capacitance = ', capacitance
+   WRITE(IU6,*)
+ ENDIF
 
 END SUBROUTINE update_NELECT
 
@@ -3510,7 +3526,8 @@ SUBROUTINE SOL_READER(IO)
    CASE (2)
       CALL NLPCM_READER(IO)
    CASE DEFAULT
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: SOL_READER: invalid value for ISOL'
+      STOP
  END SELECT
 
 
@@ -3559,7 +3576,8 @@ SUBROUTINE SOL_INIT(GRIDC, LATT_CUR, T_INFO, IO, INFO)
    CASE (2)
       CALL NLPCM_INIT
    CASE DEFAULT
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: SOL_INIT: invalid value for ISOL'
+      STOP
  END SELECT
  
 END SUBROUTINE SOL_INIT
@@ -3595,7 +3613,8 @@ SUBROUTINE SOL_WRITER(IO)
    CASE (2)
       CALL NLPCM_WRITER(IO)
    CASE DEFAULT
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: SOL_WRITER: invalid value for ISOL'
+      STOP
  END SELECT
 
 END SUBROUTINE SOL_WRITER
@@ -3638,7 +3657,8 @@ SUBROUTINE XML_WRITE_SOL
    CASE (2)
       CALL XML_WRITE_NLPCM
    CASE DEFAULT
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: XML_WRITE_SOL: invalid value for ISOL'
+      STOP
  END SELECT
 
 END SUBROUTINE XML_WRITE_SOL
@@ -3660,7 +3680,8 @@ SUBROUTINE SET_SOL_WRITE
    CASE (2)
       CALL SET_SOL_WRITE_NLPCM
    CASE DEFAULT
-      ABORT
+      IF (IU0>=0) WRITE(IU0,*) 'ERROR: SET_SOL_WRITE: invalid value for ISOL'
+      STOP
  END SELECT
 
 END SUBROUTINE SET_SOL_WRITE
