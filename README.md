@@ -192,6 +192,6 @@ Files written only for <b>ISOL</b>=2:
 * Implicit self-consistent electrolyte model in plane-wave density-functional theory. K. Mathew, V.S. C. Kolluru, S. Mula, S.N. Steinmann, and R.G. Hennig, J. Chem. Phys. 151, 234101 (2019), (https://doi.org/10.1063/1.5132354).
 
 <b>Nonlinear+nonlocal model</b>
-* Development and implementation of a nonlocal and nonlinear implicit electrolyte model. S.M.R. Islam, F. Khezeli, S. Ringe, and C. Plaisance, doi: 
+* A nonlocal and nonlinear implicit electrolyte model for plane wave density functional theory. S.M.R. Islam, F. Khezeli, S. Ringe, and C. Plaisance, doi: 
 10.48550/arXiv.2307.04551 (2023), (https://doi.org/10.48550/arXiv.2307.04551).
 
