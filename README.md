@@ -23,11 +23,11 @@ The instructions below assume you have downloaded the VASP source files in a dir
 
 2. Copy `<VASPSOL_SRC>/src/solvation.F` to `<VASP_SRC>/src/`, replacing the skeleton `solvation.F` file already there.
 
-2. Copy the appropriate patch file from `<VASPSOL_SRC>/src/patches` to `<VASP_SRC>/`. There are actually two patch files for each version of VASP. The first, named `vaspsol++-vtst-vasp_<version>.patch`, should be used if you are using the [VASP Transition State Tools](https://theory.cm.utexas.edu/vtsttools/) add-on developed by the [Henkelman group](http://henkelmanlab.org/) at UT Austin. Otherwise, use the patch file named `vaspsol++-vasp_<version>.patch`. <b>Note: We are not allowed to publicly post patches for the VASP source code. Please email [Craig Plaisance](mailto:plaisance@lsu.edu) to obtain the necessary patch.
+3. Copy the appropriate patch file from `<VASPSOL_SRC>/src/patches` to `<VASP_SRC>/`. There are actually two patch files for each version of VASP. The first, named `vaspsol++-vtst-vasp_<version>.patch`, should be used if you are using the [VASP Transition State Tools](https://theory.cm.utexas.edu/vtsttools/) add-on developed by the [Henkelman group](http://henkelmanlab.org/) at UT Austin. Otherwise, use the patch file named `vaspsol++-vasp_<version>.patch`. <b>Note: We are not allowed to publicly post patches for the VASP source code. Please email [Craig Plaisance](mailto:plaisance@lsu.edu) to obtain the necessary patch.</b>
 
-3. Apply the patch by running `patch -p1 < <patch_file>` in `<VASP_SRC>`.
+4. Apply the patch by running `patch -p1 < <patch_file>` in `<VASP_SRC>`.
 
-4. Compile VASP as you normally would.
+5. Compile VASP as you normally would.
 
 ## Input
 
