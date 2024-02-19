@@ -1523,7 +1523,7 @@ MODULE solvation_nlpcm
  
  PRIVATE
 
- PUBLIC :: NLPCM_solver, SET_SOL_WRITE_NLPCM
+ PUBLIC :: NLPCM_solver, SET_SOL_WRITE_NLPCM, qion_max
  PUBLIC :: NLPCM_READER, NLPCM_INIT, NLPCM_WRITER, XML_WRITE_NLPCM
  
  SAVE
@@ -1537,6 +1537,8 @@ MODULE solvation_nlpcm
  COMPLEX(q), ALLOCATABLE :: w_solv(:), w_cav(:), w_ion(:), w_diel(:), w(:), w_a(:), w_b(:)
  REAL(q),    ALLOCATABLE :: S_cav(:), S_diel(:), S_ion(:)
  REAL(q),    ALLOCATABLE :: Xcav(:,:)
+ 
+ REAL(q) :: qion_max = 0._q
  
  LOGICAL :: LNLDIEL=.TRUE.
  LOGICAL :: LNLION=.TRUE.
@@ -1593,7 +1595,7 @@ SUBROUTINE NLPCM_solver(phi_sol, n_e, q_sol, tol, V_corr, n_solv, A_corr)
  
  COMPLEX(q) :: dphi(:), resid(:)
  REAL(q)    :: ekappa2(:), chi(:,:,:)
- REAL(q)    :: tol_L, rms, A_LPB, A_cav, phi_G0, f_ion, q_ion, qion_lim, dphi0
+ REAL(q)    :: tol_L, rms, A_LPB, A_cav, phi_G0, f_ion, q_ion, dphi0
  INTEGER    :: iter, NCGSOL, NCGSOL_L
  
  COMPLEX(q) :: CWORK(GRIDC%MPLWV)
@@ -1617,14 +1619,16 @@ SUBROUTINE NLPCM_solver(phi_sol, n_e, q_sol, tol, V_corr, n_solv, A_corr)
  dsol_io 'Creating dielectric and ionic cavities'
  CALL CREATECAVITY(n_e, A_cav)
  
+ ! check whether the electrolyte region is large enough to accommodate the necessary counter charge
  CALL FFT3D_RL2RC(S_ion, CWORK)
  CALL GET_G0(CWORK, f_ion)
- qion_lim = f_ion * n_max*LATT_CUR%OMEGA * 0.99_q
- dsol_io ' qion_lim:  ', qion_lim
- IF (abs(q_sol) > qion_lim .AND. LNLION) THEN
+ qion_max = f_ion * n_max*LATT_CUR%OMEGA
+ dsol_io ' qion_max:  ', qion_max
+ IF (abs(q_sol) > qion_max*0.99_q .AND. LNLION) THEN
    IF (IU0>=0) THEN
       WRITE(IU0,*) 'ERROR: NLPCM_solver: your ''vacuum'' region is not large enough to accommodate the necessary counter charge'
-      WRITE(IU0,*) 'Maximum charge: ', qion_lim
+      WRITE(IU0,*) 'The counter charge is exceeding 99% of the saturation value'
+      WRITE(IU0,*) 'Maximum charge: ', qion_max
       WRITE(IU0,*) 'Surface/solute charge: ', q_sol
    ENDIF
    STOP
@@ -1657,9 +1661,10 @@ SUBROUTINE NLPCM_solver(phi_sol, n_e, q_sol, tol, V_corr, n_solv, A_corr)
    CALL SET_LPB(chi, ekappa2)
    dphi = 0._q
    CALL GET_G0(n_ion, q_ion)
-   IF (abs(q_ion) > qion_lim .AND. LNLION) THEN
+   ! adjust the G=0 component of phi if the counter charge is too close to saturation
+   IF (abs(q_ion) > qion_max*0.99_q .AND. LNLION) THEN
       dphi0 = -D_PROD_RC(CWORK, phi)/f_ion
-      dsol_io ' Adjusting G=0 component of phi, q_ion = ', q_ion, ' qion_lim = ', qion_lim, ' dphi0 = ', dphi0
+      dsol_io ' Adjusting G=0 component of phi, q_ion = ', q_ion, ' qion_max = ', qion_max, ' dphi0 = ', dphi0
       CALL SET_G0(dphi, dphi0)
    ELSE
       A_LPB = A_solv
@@ -3167,6 +3172,7 @@ MODULE solvation
  
  REAL(q) :: rms_SCF = 0._q
  REAL(q) :: q_sol = 0._q
+ REAL(q) :: ZVSUM = 0._q
  REAL(q) :: EFERMI_ref = 0._q
  REAL(q) :: capacitance_init = 1._q
  
@@ -3188,20 +3194,17 @@ CONTAINS
 ! Computes the potential, energy and force corrections due to solvation
 !
 !***********************************************************************
-SUBROUTINE SOL_VCORRECTION(CHTOT, DENCOR, CVHAR, P)
+SUBROUTINE SOL_VCORRECTION(CHTOT, DENCOR, CVHAR)
  
- USE pseudo, ONLY : potcar
  USE ini
  
  COMPLEX(q),      INTENT(IN) :: CHTOT(:,:)
  RGRID,           INTENT(IN) :: DENCOR(:)
  COMPLEX(q),      INTENT(IN) :: CVHAR(:)
- TYPE(potcar),    INTENT(IN) :: P(T_INFO%NTYP)
  
  COMPLEX(q) :: n_val(:), n_e(:), phi_sol(:), CWORK(:)
  REAL(q)    :: RWORK(:)
- REAL(q)    :: Ecorr_band, A_corr, tol, ZVSUM, tmp
- INTEGER    :: NT
+ REAL(q)    :: Ecorr_band, A_corr, tol, tmp
  
  REAL(q), PARAMETER :: tol_init = 1.e-3_q
  
@@ -3254,9 +3257,7 @@ SUBROUTINE SOL_VCORRECTION(CHTOT, DENCOR, CVHAR, P)
  
  ! compute total charge, q_sol
  CALL GET_G0(n_val, q_sol)
- DO NT = 1,T_INFO%NTYP
-   q_sol = q_sol - P(NT)%ZVALF * T_INFO%NITYP(NT) * T_INFO%VCA(NT)
- ENDDO
+ q_sol = q_sol - ZVSUM
  
  ! copy solute Hartree potential to phi_sol
  phi_sol = 0
@@ -3383,6 +3384,8 @@ SUBROUTINE update_NELECT(NELECT,EFERMI)
  REAL(q), SAVE :: EFERMI_LAST, NELECT_LAST, capacitance
  LOGICAL, SAVE :: LFIRST = .TRUE.
  
+ REAL(q) :: qsol_new
+ 
  IF (.NOT.L_const_pot()) RETURN
  
  IF (LFIRST) THEN
@@ -3394,7 +3397,20 @@ SUBROUTINE update_NELECT(NELECT,EFERMI)
  
  EFERMI_LAST = EFERMI
  NELECT_LAST = NELECT
- NELECT = NELECT - capacitance*(EFERMI - EFERMI_ref)
+ qsol_new = q_sol  - capacitance*(EFERMI - EFERMI_ref)
+ IF (qion_max > 0._q .AND. ABS(qsol_new) > qion_max*0.9_q) THEN
+   IF (ABS(q_sol) >= qion_max*0.9_q) THEN
+      IF (IU0>=0) THEN
+         WRITE(IU0,*) 'ERROR: update_NELECT: your ''vacuum'' region is not large enough to accommodate the necessary counter charge'
+         WRITE(IU0,*) 'The counter charge is exceeding 90% of the saturation value'
+         WRITE(IU0,*) 'Maximum charge: ', qion_max
+         WRITE(IU0,*) 'Surface/solute charge: ', q_sol
+      ENDIF
+      STOP
+   ENDIF
+   qsol_new = SIGN(MIN(ABS(qsol_new), qion_max*0.9_q), qsol_new)
+ ENDIF
+ NELECT = ZVSUM + qsol_new
  
  IF (IU6>=0) THEN
    WRITE(IU6,*)
@@ -3539,13 +3555,18 @@ END SUBROUTINE SOL_READER
 ! initialize solvation model
 !
 !***********************************************************************
-SUBROUTINE SOL_INIT(GRIDC, LATT_CUR, T_INFO, IO, INFO)
+SUBROUTINE SOL_INIT(GRIDC, LATT_CUR, T_INFO, P, IO, INFO)
+
+ USE pseudo, ONLY : potcar
 
  TYPE (grid_3d),   TARGET, INTENT(IN) :: GRIDC
  TYPE (latt),      TARGET, INTENT(IN) :: LATT_CUR
  TYPE (type_info), TARGET, INTENT(IN) :: T_INFO
+ TYPE (potcar),            INTENT(IN) :: P(T_INFO%NTYP)
  TYPE (in_struct), TARGET, INTENT(IN) :: IO
  TYPE (info_struct),       INTENT(IN) :: INFO
+ 
+ INTEGER :: NT
  
  ALLOCATE(n_solv(GRIDC%MPLWV),V_corr(GRIDC%MPLWV))
  
@@ -3569,6 +3590,12 @@ SUBROUTINE SOL_INIT(GRIDC, LATT_CUR, T_INFO, IO, INFO)
  ELSE
    INISOL = 1
  ENDIF
+ 
+ ! compute total valence of system
+ ZVSUM = 0._q
+ DO NT = 1,T_INFO%NTYP
+   ZVSUM = ZVSUM + P(NT)%ZVALF * T_INFO%NITYP(NT) * T_INFO%VCA(NT)
+ ENDDO
  
  SELECT CASE (ISOL)
    CASE (1)
