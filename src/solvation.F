@@ -3174,6 +3174,7 @@ MODULE solvation
  REAL(q) :: q_sol = 0._q
  REAL(q) :: ZVSUM = 0._q
  REAL(q) :: EFERMI_ref = 0._q
+ REAL(q) :: EFERMI_tol = 0._q
  REAL(q) :: capacitance_init = 1._q
  
  LOGICAL :: LWRITE = .FALSE.
@@ -3431,12 +3432,12 @@ END SUBROUTINE update_NELECT
 !! check if Fermi level is converged for constant potential calculation
 !!
 !!====================================================================
-PURE FUNCTION check_EFERMI(EFERMI,EDIFF)
+PURE FUNCTION check_EFERMI(EFERMI)
  
  LOGICAL :: check_EFERMI
- REAL(q), INTENT(IN) :: EFERMI, EDIFF
+ REAL(q), INTENT(IN) :: EFERMI
  
- check_EFERMI = (ABS(EFERMI-EFERMI_ref) < 10._q*EDIFF) .OR. (EFERMI_ref >= 0.0_q)
+ check_EFERMI = (ABS(EFERMI-EFERMI_ref) < EFERMI_tol) .OR. (EFERMI_ref >= 0.0_q)
 
 END FUNCTION check_EFERMI
 
@@ -3523,6 +3524,16 @@ SUBROUTINE SOL_READER(IO)
  CALL XML_INCAR('EFERMI_ref','F',IDUM,EFERMI_ref,CDUM,LDUM,CHARAC,N)
  
  !-----------------------------------------------------------------
+ ! EFERMI_tol
+ !-----------------------------------------------------------------
+ CALL RDATAB(LOPEN,'INCAR',IU5,'EFERMI_tol','=','#',';','F',IDUM,EFERMI_tol,CDUM,LDUM,CHARAC,N,1,IERR)
+ IF (((IERR/=0).AND.(IERR/=3)).OR. ((IERR==0).AND.(N<1))) THEN
+   sol_io 'Error reading item ''EFERMI_tol'' from file INCAR.'
+   STOP
+ ENDIF
+ CALL XML_INCAR('EFERMI_tol','F',IDUM,EFERMI_tol,CDUM,LDUM,CHARAC,N)
+ 
+ !-----------------------------------------------------------------
  ! capacitance_init
  !-----------------------------------------------------------------
  CALL RDATAB(LOPEN,'INCAR',IU5,'capacitance_init','=','#',';','I',IDUM,capacitance_init,CDUM,LDUM,CHARAC,N,1,IERR)
@@ -3596,6 +3607,9 @@ SUBROUTINE SOL_INIT(GRIDC, LATT_CUR, T_INFO, P, IO, INFO)
  DO NT = 1,T_INFO%NTYP
    ZVSUM = ZVSUM + P(NT)%ZVALF * T_INFO%NITYP(NT) * T_INFO%VCA(NT)
  ENDDO
+ 
+ ! set convergence tolerence for fermi level in constant potential calculations
+ IF (EFERMI_tol <= 0._q) EFERMI_tol = 10._q*INFO%EDIFF
  
  SELECT CASE (ISOL)
    CASE (1)
