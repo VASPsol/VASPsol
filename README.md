@@ -137,14 +137,14 @@ Initial guess for the capacitance of the unit cell (e/V), used for updating the 
 
 ### Recommended <b>INCAR</b> for an aqueous electrolyte
 
-The default parameters correspond to pure water at 298 K. To model an electrolyte, it is necessary to specify the concentration (<b>C_MOLAR</b>) and the ionic radius (<b>R_ION</b>). If the latter is not specified, it defaults to the solvent radius which is likely too small. <b>EFERMI_ref</b> should be specified to run constant potential calculations. When using the default values for an aqueous electrolyte, we recommend setting <b>EFERMI_ref</b> $= -4.47 - U$, where $U$ is the electrode potential with respect to the standard hydrogen electrode.
+The default parameters correspond to pure water at 298 K. To model an electrolyte, it is necessary to specify the concentration (<b>C_MOLAR</b>) and the ionic radius (<b>R_ION</b>). If the latter is not specified, it defaults to the solvent radius which is likely too small. <b>EFERMI_ref</b> should be specified to run constant potential calculations. When using the default values for an aqueous electrolyte, we recommend setting <b>EFERMI_ref</b> $= -4.57 - U$, where $U$ is the electrode potential with respect to the standard hydrogen electrode.
 
 ```
 LSOL = .TRUE.
 ISOL = 2
 C_MOLAR = 1.0        # set to the electrolyte concentration in mol/L
 R_ION = 4.0          # set to the ionic radius in Angstrom
-EFERMI_ref = -4.47   # set to the electron chemical potential in eV
+EFERMI_ref = -4.57   # set to the electron chemical potential in eV
 ```
 
 
