@@ -15,7 +15,7 @@ VASPsol++ adds a [nonlocal and nonlinear implicit electrolyte model](#references
 
 ## Installation
 
-VASPsol++ is mostly implemented in a single fortran file, solvation.F, that can be found in the src/ directory of the repository. Additionally, a patch file is required to make modifications to some of the original VASP source files. These patch files are version specific and are located in the src/patches director of the repository. Currently, the following patch files are available:
+VASPsol++ is mostly implemented in a single fortran file, solvation.F, that can be found in the src/ directory of the repository. Additionally, a patch file is required to make modifications to some of the original VASP source files. These patch files are version specific and must be obtained by emailing [Craig Plaisance](mailto:plaisance@lsu.edu). Currently, the following patch files are available:
 * VASP 5.4.4 (with and without VTST)
 * VASP 6.3.2 (with and without VTST)
 
@@ -25,7 +25,7 @@ The instructions below assume you have downloaded the VASP source files in a dir
 
 2. Copy `<VASPSOL_SRC>/src/solvation.F` to `<VASP_SRC>/src/`, replacing the skeleton `solvation.F` file already there.
 
-3. Copy the appropriate patch file from `<VASPSOL_SRC>/src/patches` to `<VASP_SRC>/`. There are actually two patch files for each version of VASP. The first, named `vaspsol++-vtst-vasp_<version>.patch`, should be used if you are using the [VASP Transition State Tools](https://theory.cm.utexas.edu/vtsttools/) add-on developed by the [Henkelman group](http://henkelmanlab.org/) at UT Austin. Otherwise, use the patch file named `vaspsol++-vasp_<version>.patch`. <b>Note: We are not allowed to publicly post patches for the VASP source code. Please email [Craig Plaisance](mailto:plaisance@lsu.edu) to obtain the necessary patch.</b>
+3. Copy the appropriate patch file from `<VASPSOL_SRC>/src/patches` to `<VASP_SRC>/`. There are actually two patch files for each version of VASP. The first, named `vaspsol++-vtst-vasp_<version>.patch`, should be used if you are using the [VASP Transition State Tools](https://theory.cm.utexas.edu/vtsttools/) add-on developed by the [Henkelman group](http://henkelmanlab.org/) at UT Austin. Otherwise, use the patch file named `vaspsol++-vasp_<version>.patch`.
 
 4. Apply the patch by running `patch -p1 < <patch_file>` in `<VASP_SRC>`.
 
