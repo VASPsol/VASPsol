@@ -4,6 +4,8 @@ VASPsol++ is a framework for implementing complex continuum fluid models within 
 
 VASPsol++ adds a [nonlocal and nonlinear implicit electrolyte model](#references) to the [linear polarizable continuum model](#references) contained in the original VASPsol code. Additionally, it is written in a modular format that allows for easy addition of any new continuum solvation models that are developed in the future.
 
+Although there are some significant differences in the implementation, the general ideas for the [nonlocal and nonlinear models]((#references)) were developed in the group of [Tomás Arias](https://www.lassp.cornell.edu/people/tomas-arias) at Cornell University.
+
 ## Key features of the nonlinear+nonlocal model
 
 * Nonlinear dielectric and ionic responses to model the high electric fields present at charged electrodes
@@ -134,19 +136,21 @@ VASPsol++ can perform constant potential calculations where the number of electr
 
 * <b>EFERMI_ref</b> = 0 (default) \
 Electron chemical potential with respect to vacuum. Runs a constant potential calculation when <b>EFERMI_ref</b> $\lt$ 0
+* <b>EFERMI_tol</b> = 0 (default) \
+Convergence criteria for the Fermi level. If <b>EFERMI_tol</b> $\le$ 0, it is set to 10&times;<b>EDIFF</b>
 * <b>capacitance_init</b> = 1.0 (default) \
 Initial guess for the capacitance of the unit cell (e/V), used for updating the number of electrons
 
 ### Recommended <b>INCAR</b> for an aqueous electrolyte
 
-The default parameters correspond to pure water at 298 K. To model an electrolyte, it is necessary to specify the concentration (<b>C_MOLAR</b>) and the ionic radius (<b>R_ION</b>). If the latter is not specified, it defaults to the solvent radius which is likely too small. <b>EFERMI_ref</b> should be specified to run constant potential calculations. When using the default values for an aqueous electrolyte, we recommend setting <b>EFERMI_ref</b> $= -4.57 - U$, where $U$ is the electrode potential with respect to the standard hydrogen electrode.
+The default parameters correspond to pure water at 298 K. To model an electrolyte, it is necessary to specify the concentration (<b>C_MOLAR</b>) and the ionic radius (<b>R_ION</b>). If the latter is not specified, it defaults to the solvent radius which is likely too small. <b>EFERMI_ref</b> should be specified to run constant potential calculations. In principle, the value of the Fermi level corresponding to the standard hydrogen electrode ($\varepsilon_{\rm F, SHE}$) should be determined self consistently for the DFT functional and solvation parameters you are using. The procedure for this is given in our 2023 JCP manuscript. One would then set <b>EFERMI_ref</b> to $\varepsilon_{\rm F} = \varepsilon_{\rm F, SHE} - U_{\rm SHE}$, where $U_{\rm SHE}$ is the electrode potential with respect to the standard hydrogen electrode. When using the default values for an aqueous electrolyte with the BEEF-vdW functional, we obtain a value of $\varepsilon_{\rm F, SHE} = -4.57 \rm eV$. (<b>Note:</b> the value of $-4.47 \rm eV$ reported in our manuscript is incorrect)
 
 ```
 LSOL = .TRUE.
 ISOL = 2
 C_MOLAR = 1.0        # set to the electrolyte concentration in mol/L
 R_ION = 4.0          # set to the ionic radius in Angstrom
-EFERMI_ref = -4.57   # set to the electron chemical potential in eV
+EFERMI_ref = -4.57   # set to the electron chemical potential in eV (read how to determine this value above)
 ```
 
 
@@ -189,10 +193,13 @@ Files written only for <b>ISOL</b>=2:
 
 ## References
 
+<b>Nonlinear+nonlocal model</b>
+* An implicit electrolyte model for plane wave density functional theory exhibiting nonlinear response and a nonlocal cavity definition. S.M.R. Islam, F. Khezeli, S. Ringe, and C. Plaisance, J. Chem. Phys. 159, 234117 (2023), (https://doi.org/10.1063/5.0176308).
+
 <b>Original linear+local VASPsol method</b>
 * Implicit solvation model for density-functional study of nanocrystal surfaces and reaction pathways. K. Mathew, R. Sundararaman, K. Letchworth-Weaver, T.A. Arias, and R.G. Hennig, J. Chem. Phys. 140, 084106 (2014), (https://doi.org/10.1063/1.4865107).
 * Implicit self-consistent electrolyte model in plane-wave density-functional theory. K. Mathew, V.S. C. Kolluru, S. Mula, S.N. Steinmann, and R.G. Hennig, J. Chem. Phys. 151, 234101 (2019), (https://doi.org/10.1063/1.5132354).
 
-<b>Nonlinear+nonlocal model</b>
-* An implicit electrolyte model for plane wave density functional theory exhibiting nonlinear response and a nonlocal cavity definition. S.M.R. Islam, F. Khezeli, S. Ringe, and C. Plaisance, J. Chem. Phys. 159, 234117 (2023), (https://doi.org/10.1063/5.0176308).
-
+<b>Original nonlinear+nonlocal models</b>
+* The importance of nonlinear fluid response in joint density-functional theory studies of battery systems. D. Gunceler, K. Letchworth-Weaver, R. Sundararaman, K.A. Schwarz, T.A. Arias, Model. Simul. Mater. Sc. 21, 074005 (2013), (https://doi.org/10.1088/0965-0393/21/7/074005).
+* Spicing up continuum solvation models with SaLSA: The spherically averaged liquid susceptibility ansatz. R. Sundararaman, K.A. Schwarz, K. Letchworth-Weaver, T.A. Arias, J. Chem. Phys. 142, 054102 (2015), (https://doi.org/10.1063/1.4906828).
